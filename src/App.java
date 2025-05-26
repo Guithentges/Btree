@@ -3,54 +3,47 @@ import BTree.BTree;
 
 public class App {
     public static void main(String[] args) {
+        BTree tree = new BTree();
         Scanner scanner = new Scanner(System.in);
-        BTree<Integer> tree = new BTree<>();
-        int opcao;
-
+        int option;
         do {
-            System.out.println("\n--- Menu ---");
-            System.out.println("1. Inserir número");
-            System.out.println("2. Remover número");
-            System.out.println("3. Exibir passeio pré-ordem");
-            System.out.println("4. Exibir passeio por nível");
-            System.out.println("0. Sair");
-            System.out.print("Escolha uma opção: ");
-            opcao = scanner.nextInt();
-
-            switch (opcao) {
+            System.out.println("Opções:");
+            System.out.println("1 – Inserir valor na árvore");
+            System.out.println("2 – Exibir as chaves por nível");
+            System.out.println("3 – Exibir as chaves em pré-ordem");
+            System.out.println("4 – Remover um valor da árvore");
+            System.out.println("5 – Sair");
+            System.out.print("Informe a opção desejada: ");
+            option = scanner.nextInt();
+            switch(option) {
                 case 1:
-                    System.out.print("Digite um número para inserir: ");
-                    int valor = scanner.nextInt();
-                    tree.insert(valor);
-                    System.out.println("Número " + valor + " inserido!");
+                    System.out.print("Valor a inserir: ");
+                    int valInsert = scanner.nextInt();
+                    tree.insert(valInsert);
+                    System.out.println("Valor " + valInsert + " inserido.");
                     break;
-
                 case 2:
-                    System.out.println("Digite o número que deseja remover: ");
-                    int num = scanner.nextInt();
-                    tree.delete(num);
+                    System.out.println("Chaves da árvore (por nível):");
+                    tree.levelOrder();
                     break;
                 case 3:
-                    System.out.print("Passeio pré-ordem: ");
+                    System.out.println("Chaves da árvore (pré-ordem):");
                     tree.preOrder();
                     break;
-
                 case 4:
-                    System.out.println("Passeio por nível:");
-                    tree.LevelOrder();
+                    System.out.print("Valor a remover: ");
+                    int valRemove = scanner.nextInt();
+                    tree.delete(valRemove);
+                    System.out.println("Valor " + valRemove + " removido (se existente).");
                     break;
-
-                case 0:
-                    System.out.println("Encerrando o programa...");
+                case 5:
+                    System.out.println("Encerrando...");
                     break;
-
                 default:
                     System.out.println("Opção inválida! Tente novamente.");
             }
-
-        } while (opcao != 0);
-
+            System.out.println();
+        } while(option != 5);
         scanner.close();
     }
 }
-
