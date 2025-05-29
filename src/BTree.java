@@ -1,4 +1,4 @@
-package Btree2;
+
 
 public class BTree {
     /** Objeto usado internamente para propagar divisões. */

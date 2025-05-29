@@ -1,4 +1,4 @@
-package Btree2;
+
 
 public class BTreeNode {
     final int M;                   // ordem da árvore
