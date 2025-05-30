@@ -151,6 +151,8 @@ private void preOrderRec(BTreeNode node) {
         if (i < node.qtd - 1) System.out.print(",");
     }
     System.out.print("] ");
+
+    //se nó não for folha
     if (!node.leaf) {
         for (int i = 0; i <= node.qtd; i++)
             preOrderRec(node.children[i]);
@@ -177,10 +179,12 @@ private void deleteRec(BTreeNode node, int key) {
         //se for uma página
         } else {
             BTreeNode nextChild = node.children[idx + 1];
+            //Se o filho da direita tem mais que o número mínimo de chaves
             if (nextChild.qtd > M / 2) {
                 int next = getNext(nextChild);
                 node.keys[idx] = next;
                 deleteRec(nextChild, next);
+            //Se o filho da esquerda tem mais que o número mínimo de chaves
             } else {
                 BTreeNode prevChild = node.children[idx];
                 if (prevChild.qtd > M / 2) {
@@ -203,6 +207,7 @@ private void deleteRec(BTreeNode node, int key) {
             BTreeNode leftbro = (idx > 0) ? node.children[idx - 1] : null;
             BTreeNode rightbro = (idx < node.qtd) ? node.children[idx + 1] : null;
 
+            //irmão da direita existe e tem mais que o mínimo de chaves
             if (rightbro != null && rightbro.qtd > M / 2) {
                 child.keys[child.qtd] = node.keys[idx];
 
@@ -219,6 +224,7 @@ private void deleteRec(BTreeNode node, int key) {
                 if (!rightbro.leaf)
                     rightbro.children[rightbro.qtd - 1] = rightbro.children[rightbro.qtd];
                 rightbro.qtd--;
+            //irmão àda esquerda existe e tem mais que o mínimo de chaves    
             } else if (leftbro != null && leftbro.qtd > M / 2) {
                 for (int i = child.qtd; i > 0; i--) {
                     child.keys[i] = child.keys[i - 1];
@@ -235,6 +241,7 @@ private void deleteRec(BTreeNode node, int key) {
                 child.qtd++;
                 node.keys[idx - 1] = leftbro.keys[leftbro.qtd - 1];
                 leftbro.qtd--;
+            //os irmãos têm número mínimo de chaves
             } else {
                 if (rightbro != null) {
                     concat(node, idx);
