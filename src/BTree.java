@@ -1,133 +1,132 @@
-
-
 public class BTree {
     
     private static class SplitResult {
-        int median;          
-        BTreeNode right;    
-        SplitResult(int median, BTreeNode right) {
-            this.median = median;
+        int chaveMediana;          
+        NodeBTree right;    
+        SplitResult(int chaveMediana, NodeBTree right) {
+            this.chaveMediana = chaveMediana;
             this.right = right;
         }
     }
-    private BTreeNode root;
-    private final int M;                   
+    
+    private final int M;  
+    private NodeBTree root;               
 
     public BTree() {
         this.M = 5;
     }
 
     // função para inserir valor na arvore
-    public void insert(int key) {
+    public void insert(int chave) {
         if (root == null) {
-            root = new BTreeNode(M, true);
-            root.keys[0] = key;
-            root.qtd = 1;
+            root = new NodeBTree(M, true);
+            root.chaves[0] = chave;
+            root.numChaves = 1;
             return;
         }
 
-        SplitResult res = insertRec(root, key);
+        SplitResult retorno  = inserir(root, chave);
 
         // Se a raiz passar do limite, cria nova raiz
-        if (res != null) {
-            BTreeNode newRoot = new BTreeNode(M, false);
-            newRoot.keys[0] = res.median;
-            newRoot.children[0] = root;
-            newRoot.children[1] = res.right;
-            newRoot.qtd = 1;
+        if (retorno != null) {
+            NodeBTree newRoot = new NodeBTree(M, false);
+            newRoot.chaves[0] = retorno.chaveMediana;
+            newRoot.filhos[0] = root;
+            newRoot.filhos[1] = retorno.right;
+            newRoot.numChaves = 1;
             root = newRoot;
         }
     }
     
-    private SplitResult insertRec(BTreeNode node, int key) {
+    private SplitResult inserir(NodeBTree node, int chave) {
 
         // caso nó folha
-        if (node.leaf) {
+        if (node.folha) {
             // insere mantendo ordenação
-            int i = node.qtd - 1;
-            while (i >= 0 && node.keys[i] > key) {
-                node.keys[i + 1] = node.keys[i];
+            int i = node.numChaves - 1;
+            while (i >= 0 && node.chaves[i] > chave) {
+                node.chaves[i + 1] = node.chaves[i];
                 i--;
             }
-            node.keys[i + 1] = key;
-            node.qtd++;
+            node.chaves[i + 1] = chave;
+            node.numChaves++;
             //observa se o nó ultrapassou o limite
-            return (node.qtd < M) ? null : split(node);   
+            return (node.numChaves < M) ? null : split(node);   
         }
 
         // caso nó página
-        int idx = node.qtd - 1;
-        while (idx >= 0 && node.keys[idx] > key) idx--;
-        idx++;                                   
+        int pos = node.numChaves - 1;
+        while (pos >= 0 && node.chaves[pos] > chave) pos--;
+        pos++;                                   
 
-        SplitResult childRes = insertRec(node.children[idx], key);
+        SplitResult childRes = inserir(node.filhos[pos], chave);
 
-        // Se o filho dividiu, inserir a mediana no nó pai
+        // Se o filho dividiu, inserir a chaveMedianaa no nó pai
         if (childRes != null) {
             // desloca para abrir espaço
-            for (int j = node.qtd; j > idx; j--) {
-                node.keys[j]     = node.keys[j - 1];
-                node.children[j+1] = node.children[j];
+            for (int j = node.numChaves; j > pos; j--) {
+                node.chaves[j]     = node.chaves[j - 1];
+                node.filhos[j+1] = node.filhos[j];
             }
-            node.keys[idx] = childRes.median;
-            node.children[idx + 1] = childRes.right;
-            node.qtd++;
+            node.chaves[pos] = childRes.chaveMediana;
+            node.filhos[pos + 1] = childRes.right;
+            node.numChaves++;
         }
         //observa se o nó ultrapassou o limite
-        return (node.qtd < M) ? null : split(node);       
+        return (node.numChaves < M) ? null : split(node);       
     }
 
     // cisão do nó
-    private SplitResult split(BTreeNode node) {
-        int mid = M / 2; 
+    private SplitResult split(NodeBTree node) {
+        int meio = M / 2; 
         //trata o nó da direita
-        BTreeNode right = new BTreeNode(M, node.leaf);
-        right.qtd = node.qtd - mid - 1;
-        for (int j = 0; j < right.qtd; j++)
-            right.keys[j] = node.keys[mid + 1 + j];
-        if (!node.leaf) {
-            for (int j = 0; j <= right.qtd; j++)
-                right.children[j] = node.children[mid + 1 + j];
+        NodeBTree right = new NodeBTree(M, node.folha);
+        right.numChaves = node.numChaves - meio - 1;
+        for (int j = 0; j < right.numChaves; j++)
+            right.chaves[j] = node.chaves[meio + 1 + j];
+        if (!node.folha) {
+            for (int j = 0; j <= right.numChaves; j++)
+                right.filhos[j] = node.filhos[meio + 1 + j];
         }
 
-        int median = node.keys[mid];
-        node.qtd = mid;                 
+        int chaveMediana = node.chaves[meio];
+        node.numChaves = meio;                 
 
-        return new SplitResult(median,right);
+        return new SplitResult(chaveMediana,right);
 }
 
 
 
     // imprimir em ordem
-    public void levelOrder() {
+    public void percorrerPorNivel() {
         if (root == null) return;
         java.util.Queue<Integer>  level  = new java.util.LinkedList<>();
-        java.util.Queue<BTreeNode> queue  = new java.util.LinkedList<>();
+        java.util.Queue<NodeBTree> queue  = new java.util.LinkedList<>();
         queue.add(root); level.add(0);
 
         int current = 0;
-        System.out.print("Nível 0: ");
+        System.out.print("N0: ");
         while (!queue.isEmpty()) {
-            BTreeNode node = queue.poll();
+            NodeBTree node = queue.poll();
             int lvl = level.poll();
             if (lvl != current) {
                 current = lvl;
-                System.out.print("\nNível " + current + ": ");
+                System.out.print("\nN" + current + ": ");
             }
 
             //imprime o nó
-            System.out.print("[");
+            System.out.print("(");
             for (int i = 0; i < M-1; i++) {
-                if (i < node.qtd) System.out.print(node.keys[i]);
+                if (i < node.numChaves) System.out.print(node.chaves[i]);
                 else System.out.print("_");
-                if (i < M-2) System.out.print(",");
+                if (i < M-2) System.out.print("|");
             }
-            System.out.print("] ");
+            System.out.print(")");
 
             //se nó não for folha
-            if (!node.leaf) {
-                for (int i = 0; i <= node.qtd; i++) {
-                    queue.add(node.children[i]);
+            if (!node.folha) {
+                for (int i = 0; i <= node.numChaves; i++) {
+                    queue.add(node.filhos[i]);
                     level.add(lvl + 1);
                 }
             }
@@ -136,154 +135,154 @@ public class BTree {
     }
 
 //chamada da função pré ordem recursiva
-public void preOrder() {
-    preOrderRec(root);
+public void percorrerPreOrdem() {
+    imprimirPreOrdem(root);
     System.out.println();
 }
 
-private void preOrderRec(BTreeNode node) {
+private void imprimirPreOrdem(NodeBTree node) {
     if (node == null) return;
 
     //imprime o nó 
     System.out.print("[");
-    for (int i = 0; i < node.qtd; i++) {
-        System.out.print(node.keys[i]);
-        if (i < node.qtd - 1) System.out.print(",");
+    for (int i = 0; i < node.numChaves; i++) {
+        System.out.print(node.chaves[i]);
+        if (i < node.numChaves - 1) System.out.print(",");
     }
     System.out.print("] ");
 
     //se nó não for folha
-    if (!node.leaf) {
-        for (int i = 0; i <= node.qtd; i++)
-            preOrderRec(node.children[i]);
+    if (!node.folha) {
+        for (int i = 0; i <= node.numChaves; i++)
+            imprimirPreOrdem(node.filhos[i]);
     }
 }
 // chamada da função de deletar um valor
-public void delete(int key) {
-    deleteRec(root, key);
-    if (root.qtd == 0 && !root.leaf)
-        root = root.children[0];
+public void remover(int chave) {
+    removerRec(root, chave);
+    if (root.numChaves == 0 && !root.folha)
+        root = root.filhos[0];
 }
 
-private void deleteRec(BTreeNode node, int key) {
-    int idx = 0;
-    while (idx < node.qtd && key > node.keys[idx]) idx++;
+private void removerRec(NodeBTree node, int chave) {
+    int pos = 0;
+    while (pos < node.numChaves && chave > node.chaves[pos]) pos++;
 
     // Caso 1: chave está neste nó
-    if (idx < node.qtd && node.keys[idx] == key) {
+    if (pos < node.numChaves && node.chaves[pos] == chave) {
         //se nó for uma folha
-        if (node.leaf) {
-            for (int i = idx; i < node.qtd - 1; i++)
-                node.keys[i] = node.keys[i + 1];
-            node.qtd--;
+        if (node.folha) {
+            for (int i = pos; i < node.numChaves - 1; i++)
+                node.chaves[i] = node.chaves[i + 1];
+            node.numChaves--;
         //se for uma página
         } else {
-            BTreeNode nextChild = node.children[idx + 1];
+            NodeBTree nextChild = node.filhos[pos + 1];
             //Se o filho da direita tem mais que o número mínimo de chaves
-            if (nextChild.qtd > M / 2) {
+            if (nextChild.numChaves > M / 2) {
                 int next = getNext(nextChild);
-                node.keys[idx] = next;
-                deleteRec(nextChild, next);
+                node.chaves[pos] = next;
+                removerRec(nextChild, next);
             //Se o filho da esquerda tem mais que o número mínimo de chaves
             } else {
-                BTreeNode prevChild = node.children[idx];
-                if (prevChild.qtd > M / 2) {
+                NodeBTree prevChild = node.filhos[pos];
+                if (prevChild.numChaves > M / 2) {
                     int pred = getPrevious(prevChild);
-                    node.keys[idx] = pred;
-                    deleteRec(prevChild, pred);
+                    node.chaves[pos] = pred;
+                    removerRec(prevChild, pred);
                 } else {
-                    concat(node, idx);
-                    deleteRec(prevChild, key);
+                    concat(node, pos);
+                    removerRec(prevChild, chave);
                 }
             }
         }
         
         // Caso 2: chave está em subárvore
         }else{
-        if (node.leaf) return;
-        BTreeNode child = node.children[idx];
+        if (node.folha) return;
+        NodeBTree child = node.filhos[pos];
       
-        if (child.qtd == M / 2) {
-            BTreeNode leftbro = (idx > 0) ? node.children[idx - 1] : null;
-            BTreeNode rightbro = (idx < node.qtd) ? node.children[idx + 1] : null;
+        if (child.numChaves == M / 2) {
+            NodeBTree leftbro = (pos > 0) ? node.filhos[pos - 1] : null;
+            NodeBTree rightbro = (pos < node.numChaves) ? node.filhos[pos + 1] : null;
 
             //irmão da direita existe e tem mais que o mínimo de chaves
-            if (rightbro != null && rightbro.qtd > M / 2) {
-                child.keys[child.qtd] = node.keys[idx];
+            if (rightbro != null && rightbro.numChaves > M / 2) {
+                child.chaves[child.numChaves] = node.chaves[pos];
 
-                if (!child.leaf)
-                    child.children[child.qtd + 1] = rightbro.children[0];
-                child.qtd++;
-                node.keys[idx] = rightbro.keys[0];
-                for (int i = 0; i < rightbro.qtd - 1; i++) {
-                    rightbro.keys[i] = rightbro.keys[i + 1];
-                    if (!rightbro.leaf)
-                        rightbro.children[i] = rightbro.children[i + 1];
+                if (!child.folha)
+                    child.filhos[child.numChaves + 1] = rightbro.filhos[0];
+                child.numChaves++;
+                node.chaves[pos] = rightbro.chaves[0];
+                for (int i = 0; i < rightbro.numChaves - 1; i++) {
+                    rightbro.chaves[i] = rightbro.chaves[i + 1];
+                    if (!rightbro.folha)
+                        rightbro.filhos[i] = rightbro.filhos[i + 1];
                 }
 
-                if (!rightbro.leaf)
-                    rightbro.children[rightbro.qtd - 1] = rightbro.children[rightbro.qtd];
-                rightbro.qtd--;
+                if (!rightbro.folha)
+                    rightbro.filhos[rightbro.numChaves - 1] = rightbro.filhos[rightbro.numChaves];
+                rightbro.numChaves--;
             //irmão da esquerda existe e tem mais que o mínimo de chaves    
-            } else if (leftbro != null && leftbro.qtd > M / 2) {
-                for (int i = child.qtd; i > 0; i--) {
-                    child.keys[i] = child.keys[i - 1];
-                    if (!child.leaf)
-                        child.children[i + 1] = child.children[i];
+            } else if (leftbro != null && leftbro.numChaves > M / 2) {
+                for (int i = child.numChaves; i > 0; i--) {
+                    child.chaves[i] = child.chaves[i - 1];
+                    if (!child.folha)
+                        child.filhos[i + 1] = child.filhos[i];
                 }
                 
-                if (!child.leaf)
-                    child.children[1] = child.children[0];
-                child.keys[0] = node.keys[idx - 1];
+                if (!child.folha)
+                    child.filhos[1] = child.filhos[0];
+                child.chaves[0] = node.chaves[pos - 1];
                
-                if (!leftbro.leaf)
-                    child.children[0] = leftbro.children[leftbro.qtd];
-                child.qtd++;
-                node.keys[idx - 1] = leftbro.keys[leftbro.qtd - 1];
-                leftbro.qtd--;
+                if (!leftbro.folha)
+                    child.filhos[0] = leftbro.filhos[leftbro.numChaves];
+                child.numChaves++;
+                node.chaves[pos - 1] = leftbro.chaves[leftbro.numChaves - 1];
+                leftbro.numChaves--;
             //os irmãos têm número mínimo de chaves
             } else {
                 if (rightbro != null) {
-                    concat(node, idx);
-                    child = node.children[idx];
+                    concat(node, pos);
+                    child = node.filhos[pos];
                 } else {
-                    concat(node, idx - 1);
-                    child = node.children[idx - 1];
+                    concat(node, pos - 1);
+                    child = node.filhos[pos - 1];
                 }
             }
         }
-        deleteRec(child, key);
+        removerRec(child, chave);
     }
 }
 //função para pegar o antecessor
-private int getPrevious(BTreeNode node) {
-    while (!node.leaf)
-        node = node.children[node.qtd];
-    return node.keys[node.qtd - 1];
+private int getPrevious(NodeBTree node) {
+    while (!node.folha)
+        node = node.filhos[node.numChaves];
+    return node.chaves[node.numChaves - 1];
 }
 //função para pegar o sucessor
-private int getNext(BTreeNode node) {
-    while (!node.leaf)
-        node = node.children[0];
-    return node.keys[0];
+private int getNext(NodeBTree node) {
+    while (!node.folha)
+        node = node.filhos[0];
+    return node.chaves[0];
 }
 //função para concatenar os nós
-private void concat(BTreeNode parent, int idx) {
-    BTreeNode child = parent.children[idx];
-    BTreeNode bro = parent.children[idx + 1];
-    child.keys[child.qtd] = parent.keys[idx];
-    for (int i = 0; i < bro.qtd; i++)
-        child.keys[child.qtd + 1 + i] = bro.keys[i];
-    if (!child.leaf) {
-        for (int i = 0; i <= bro.qtd; i++)
-            child.children[child.qtd + 1 + i] = bro.children[i];
+private void concat(NodeBTree parent, int pos) {
+    NodeBTree child = parent.filhos[pos];
+    NodeBTree bro = parent.filhos[pos + 1];
+    child.chaves[child.numChaves] = parent.chaves[pos];
+    for (int i = 0; i < bro.numChaves; i++)
+        child.chaves[child.numChaves + 1 + i] = bro.chaves[i];
+    if (!child.folha) {
+        for (int i = 0; i <= bro.numChaves; i++)
+            child.filhos[child.numChaves + 1 + i] = bro.filhos[i];
     }
-    child.qtd += bro.qtd + 1;
+    child.numChaves += bro.numChaves + 1;
 
-    for (int i = idx; i < parent.qtd - 1; i++) {
-        parent.keys[i] = parent.keys[i + 1];
-        parent.children[i + 1] = parent.children[i + 2];
+    for (int i = pos; i < parent.numChaves - 1; i++) {
+        parent.chaves[i] = parent.chaves[i + 1];
+        parent.filhos[i + 1] = parent.filhos[i + 2];
     }
-    parent.qtd--;
+    parent.numChaves--;
 }
 }
