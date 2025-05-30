@@ -121,7 +121,7 @@ public class BTree {
                 else System.out.print("_");
                 if (i < M-2) System.out.print("|");
             }
-            System.out.print(")");
+            System.out.print(") ");
 
             //se nó não for folha
             if (!node.folha) {
