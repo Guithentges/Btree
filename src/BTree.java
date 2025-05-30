@@ -224,7 +224,7 @@ private void deleteRec(BTreeNode node, int key) {
                 if (!rightbro.leaf)
                     rightbro.children[rightbro.qtd - 1] = rightbro.children[rightbro.qtd];
                 rightbro.qtd--;
-            //irmão àda esquerda existe e tem mais que o mínimo de chaves    
+            //irmão da esquerda existe e tem mais que o mínimo de chaves    
             } else if (leftbro != null && leftbro.qtd > M / 2) {
                 for (int i = child.qtd; i > 0; i--) {
                     child.keys[i] = child.keys[i - 1];
