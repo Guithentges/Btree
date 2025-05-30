@@ -28,7 +28,7 @@ public class BTree {
 
         SplitResult res = insertRec(root, key);
 
-        // Se a raiz estourar, cria nova raiz
+        // Se a raiz passar do limite, cria nova raiz
         if (res != null) {
             BTreeNode newRoot = new BTreeNode(M, false);
             newRoot.keys[0] = res.median;
@@ -105,14 +105,14 @@ public class BTree {
         java.util.Queue<BTreeNode> queue  = new java.util.LinkedList<>();
         queue.add(root); level.add(0);
 
-        int cur = 0;
+        int current = 0;
         System.out.print("Nível 0: ");
         while (!queue.isEmpty()) {
             BTreeNode node = queue.poll();
             int lvl = level.poll();
-            if (lvl != cur) {
-                cur = lvl;
-                System.out.print("\nNível " + cur + ": ");
+            if (lvl != current) {
+                current = lvl;
+                System.out.print("\nNível " + current + ": ");
             }
 
             //imprime o nó

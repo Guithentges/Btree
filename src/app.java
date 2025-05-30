@@ -9,13 +9,13 @@ public class app {
         int opcao;
 
         do {
-            System.out.println("\nOpções:");
-            System.out.println("1 Inserir valor na árvore");
-            System.out.println("2 Exibir as chaves por nível");
-            System.out.println("3 Exibir as chaves em ordem");
-            System.out.println("4 Remover um valor da árvore");
-            System.out.println("0 Sair");
-            System.out.print("Informe a opção desejada: ");
+            System.out.println("\n ------- Menu -------");
+            System.out.println("1 - Inserir valor na árvore");
+            System.out.println("2 - Exibir as chaves por nível");
+            System.out.println("3 - Exibir as chaves em ordem");
+            System.out.println("4 - Remover um valor da árvore");
+            System.out.println("0 - Sair");
+            System.out.print("Digite a opção desejada: ");
             opcao = sc.nextInt();
 
             switch (opcao) {
@@ -36,7 +36,7 @@ public class app {
                     btree.delete(del);
                     break;
                 case 0:
-                    System.out.println("Encerrando...");
+                    System.out.println("Encerrando o programa...");
                     break;
                 default:
                     System.out.println("Opção inválida.");

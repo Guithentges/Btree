@@ -1,16 +1,14 @@
-
-
 public class BTreeNode {
-    final int M;                   // ordem da árvore
-    int qtd;                         // quantidade de chaves actualmente no nó
-    int[] keys;                    // tamanho M   (1 posição extra)
-    BTreeNode[] children;          // tamanho M+1 (1 posição extra)
+    final int M;                  
+    int qtd;                         
+    int[] keys;                  
+    BTreeNode[] children;          
     boolean leaf;
 
     BTreeNode(int M, boolean leaf) {
         this.M = M;
         this.leaf = leaf;
-        this.keys = new int[M];        // ex.: M=5 → 5 posições
+        this.keys = new int[M];       
         this.children = new BTreeNode[M+1];
         this.qtd = 0;
     }
